@@ -38,5 +38,5 @@ As this project is still very new and untested we're keen for everyone to experi
 
 Thanks!
 
-Alessandro, Tommaso - Arduino
+Alessandro, Tommaso - Arduino  
 Josh, Scarlett - Opendesk
