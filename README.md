@@ -6,7 +6,7 @@ We’re hoping to develop Bizmo/a into a proof of concept that shows how remote 
 
 ## How to use
 
-Currently set up to work with the Arduino MKR1000
+Currently set up to work with the [Arduino MKR1000](https://www.arduino.cc/en/Main/ArduinoMKR1000)
 
 You'll need to have the [Arduino Text Editor](https://www.arduino.cc/en/Main/Software) installed to use the Arduino board.
 
