@@ -22,11 +22,11 @@ int volCompareLevel1 = ((1 * volCompare) + 1);
 int volCompareLevel2 = ((3 * volCompare) + 1);
 int volCompareLevel3 = ((5 * volCompare) + 1);
 
-const int sampleWindow = 100; // Sample window width in mS (50 mS = 20Hz)
-unsigned int sample;
+const int rightEarSampleWindow = 100; // rightEarSample window width in mS (50 mS = 20Hz)
+unsigned int rightEarSample;
 
-const int sampleWindow2 = 100; // Sample window width in mS (50 mS = 20Hz)
-unsigned int sample2;
+const int rightEarSampleWindow2 = 100; // rightEarSample window width in mS (50 mS = 20Hz)
+unsigned int rightEarrightEarSample;
 unsigned long intervalTime;
 
 int motionPin = A3;    // select the input pin for the potentiometer
@@ -122,14 +122,14 @@ void combiMotion(int shakeAngle, int nodAngle)
 }
 
 
-void nodDance(int nodTopAngle, int nodCentreAngle, int nodBottomAngle, int nodNumber, int overrideNodSpeed)
+void nodDance(int nodTopAngle, int nodResetAngle, int nodBottomAngle, int nodNumber, int overrideNodSpeed)
 {
 
   int nodNumberIndex = 1;
 
   /// reset the nod to the middle
-  if (nodServoPos > nodCentreAngle) {
-    while (nodServoPos > nodCentreAngle) {
+  if (nodServoPos > nodResetAngle) {
+    while (nodServoPos > nodResetAngle) {
       nodServoPos--;
       myNodServo.write(nodServoPos);
       if (overrideNodSpeed == 0) {
@@ -139,7 +139,7 @@ void nodDance(int nodTopAngle, int nodCentreAngle, int nodBottomAngle, int nodNu
       }      
     }  
   } else {
-    while (nodServoPos < nodCentreAngle) {
+    while (nodServoPos < nodResetAngle) {
       nodServoPos++;
       myNodServo.write(nodServoPos);
       if (overrideNodSpeed == 0) {
@@ -183,8 +183,8 @@ void nodDance(int nodTopAngle, int nodCentreAngle, int nodBottomAngle, int nodNu
   }
 
   /// reset the nod to the middle
-  if (nodServoPos > nodCentreAngle) {
-    while (nodServoPos > nodCentreAngle) {
+  if (nodServoPos > nodResetAngle) {
+    while (nodServoPos > nodResetAngle) {
       nodServoPos--;
       myNodServo.write(nodServoPos);
       if (overrideNodSpeed == 0) {
@@ -194,13 +194,113 @@ void nodDance(int nodTopAngle, int nodCentreAngle, int nodBottomAngle, int nodNu
       }
     }  
   } else {
-    while (nodServoPos < nodCentreAngle) {
+    while (nodServoPos < nodResetAngle) {
       nodServoPos++;
       myNodServo.write(nodServoPos);
       if (overrideNodSpeed == 0) {
         delay(nodServoSpeed);
       } else {
         delay(overrideNodSpeed);
+      }
+    }
+  }
+
+}
+
+void shakeDance(int nodAngle, int shakeRightAngle, int shakeResetAngle, int shakeLeftAngle, int shakeNumber, int overrideShakeSpeed)
+{
+
+  int shakeNumberIndex = 1;
+
+  /// reset the nod to the middle
+  if (nodServoPos > nodAngle) {
+    while (nodServoPos > nodAngle) {
+      nodServoPos--;
+      myNodServo.write(nodServoPos);
+      delay(nodServoSpeed);
+    }  
+  } else {
+    while (nodServoPos < nodAngle) {
+      nodServoPos++;
+      myNodServo.write(nodServoPos);
+      delay(nodServoSpeed);
+    }
+  }
+
+  /// reset the shake to the middle
+  if (shakeServoPos > shakeResetAngle) {
+    while (shakeServoPos > shakeResetAngle) {
+      shakeServoPos--;
+      myShakeServo.write(shakeServoPos);
+      if (overrideShakeSpeed == 0) {
+        delay(shakeServoSpeed);
+      } else {
+        delay(overrideShakeSpeed);
+      }
+    }  
+  } else {
+    while (shakeServoPos < shakeResetAngle) {
+      shakeServoPos++;
+      myShakeServo.write(shakeServoPos);
+      if (overrideShakeSpeed == 0) {
+        delay(shakeServoSpeed);
+      } else {
+        delay(overrideShakeSpeed);
+      }
+    }
+  }
+
+
+  /// complete a number of shakes
+  while (shakeNumberIndex < shakeNumber) {
+
+    /// complete a full left shake
+    while (shakeServoPos > shakeLeftAngle) {
+      shakeServoPos--;
+      myShakeServo.write(shakeServoPos);
+      if (overrideShakeSpeed == 0) {
+        delay(shakeServoSpeed);
+      } else {
+        delay(overrideShakeSpeed);
+      }
+    }
+
+    /// complete a full right shake
+    while (shakeServoPos < shakeRightAngle) {
+      shakeServoPos++;
+      myShakeServo.write(shakeServoPos);
+      if (overrideShakeSpeed == 0) {
+        delay(shakeServoSpeed);
+      } else {
+        delay(overrideShakeSpeed);
+      }
+
+    }
+
+    /// increment the shake index
+    shakeNumberIndex++;
+    
+  }
+
+  /// reset the shake to the middle
+  if (shakeServoPos > shakeResetAngle) {
+    while (shakeServoPos > shakeResetAngle) {
+      shakeServoPos--;
+      myShakeServo.write(shakeServoPos);
+      if (overrideShakeSpeed == 0) {
+        delay(shakeServoSpeed);
+      } else {
+        delay(overrideShakeSpeed);
+      }
+    }  
+  } else {
+    while (shakeServoPos < shakeResetAngle) {
+      shakeServoPos++;
+      myShakeServo.write(shakeServoPos);
+      if (overrideShakeSpeed == 0) {
+        delay(shakeServoSpeed);
+      } else {
+        delay(overrideShakeSpeed);
       }
     }
   }
@@ -223,50 +323,49 @@ void loop()
 
   motionSensor();
 
-  
-  unsigned long startMillis = millis(); // Start of sample window
-  unsigned int peakToPeak = 0;   // peak-to-peak level
+  unsigned long startMillis = millis(); // Start of rightEarSample window
+  unsigned int leftEarPeak = 0;   // peak-to-peak level
 
   unsigned int signalMax = 0;
   unsigned int signalMin = 1024;
 
-  while (millis() - startMillis < sampleWindow)
+  while (millis() - startMillis < rightEarSampleWindow)
   {
-    sample = analogRead(A4);
-    if (sample < 1024)  // toss out spurious readings
+    rightEarSample = analogRead(A4);
+    if (rightEarSample < 1024)  // toss out spurious readings
     {
-      if (sample > signalMax)
+      if (rightEarSample > signalMax)
       {
-        signalMax = sample;  // save just the max levels
+        signalMax = rightEarSample;  // save just the max levels
       }
-      else if (sample < signalMin)
+      else if (rightEarSample < signalMin)
       {
-        signalMin = sample;  // save just the min levels
+        signalMin = rightEarSample;  // save just the min levels
       }
     }
   }
-  peakToPeak = signalMax - signalMin;  // max - min = peak-peak amplitude
+  leftEarPeak = signalMax - signalMin;  // max - min = peak-peak amplitude
 
 
 
-  unsigned long startMillis2 = millis(); // Start of sample window
-  unsigned int peakToPeak2 = 0;   // peak-to-peak level
+  unsigned long startMillis2 = millis(); // Start of rightEarSample window
+  unsigned int rightEarPeak = 0;   // peak-to-peak level
 
   unsigned int signalMax2 = 0;
   unsigned int signalMin2 = 1024;
 
-  while (millis() - startMillis2 < sampleWindow2)
+  while (millis() - startMillis2 < rightEarSampleWindow2)
   {
-    sample2 = analogRead(A5);
-    if (sample2 < 1024)  // toss out spurious readings
+    rightEarrightEarSample = analogRead(A5);
+    if (rightEarrightEarSample < 1024)  // toss out spurious readings
     {
-      if (sample2 > signalMax2)
+      if (rightEarrightEarSample > signalMax2)
       {
-        signalMax2 = sample2;  // save just the max levels
+        signalMax2 = rightEarrightEarSample;  // save just the max levels
       }
-      else if (sample2 < signalMin2)
+      else if (rightEarrightEarSample < signalMin2)
       {
-        signalMin2 = sample2;  // save just the min levels
+        signalMin2 = rightEarrightEarSample;  // save just the min levels
       }
     }
   }
@@ -275,17 +374,17 @@ void loop()
 //  Serial.println("Nod dance should be happening");
 
       
-  peakToPeak2 = signalMax2 - signalMin2;  // max - min = peak-peak amplitude
+  rightEarPeak = signalMax2 - signalMin2;  // max - min = peak-peak amplitude
 
 
-  if (peakToPeak > 120 || peakToPeak2 > 120) {
+  if (leftEarPeak > 120 || rightEarPeak > 120) {
 
 //    nodDance(125, 90, 55, 2, 30);
 
 
     ///// turns to left
 
-    if (peakToPeak > peakToPeak2 * volCompareLevel1 && peakToPeak < peakToPeak2 * volCompareLevel2) {
+    if (leftEarPeak > rightEarPeak * volCompareLevel1 && leftEarPeak < rightEarPeak * volCompareLevel2) {
 
       Serial.print("mic1 is ");
       Serial.print(volCompareLevel1);
@@ -299,7 +398,7 @@ void loop()
 
     }
 
-    if (peakToPeak > peakToPeak2 * volCompareLevel2 && peakToPeak < peakToPeak2 * volCompareLevel3) {
+    if (leftEarPeak > rightEarPeak * volCompareLevel2 && leftEarPeak < rightEarPeak * volCompareLevel3) {
 
       Serial.print("mic1 is ");
       Serial.print(volCompareLevel2);
@@ -312,7 +411,7 @@ void loop()
 
     }
 
-    if (peakToPeak > peakToPeak2 * volCompareLevel3) {
+    if (leftEarPeak > rightEarPeak * volCompareLevel3) {
 
       Serial.print("mic1 is more than ");
       Serial.print(volCompareLevel3);
@@ -325,7 +424,7 @@ void loop()
 
     ///// turns to right
 
-    if ( peakToPeak2 > peakToPeak * volCompareLevel1 && peakToPeak2 < peakToPeak * volCompareLevel2 ) {
+    if ( rightEarPeak > leftEarPeak * volCompareLevel1 && rightEarPeak < leftEarPeak * volCompareLevel2 ) {
 
       Serial.print("mic2 is ");
       Serial.print(volCompareLevel1);
@@ -337,7 +436,7 @@ void loop()
 
     }
 
-    if (peakToPeak2 > peakToPeak * volCompareLevel2 && peakToPeak2 < peakToPeak * volCompareLevel3) {
+    if (rightEarPeak > leftEarPeak * volCompareLevel2 && rightEarPeak < leftEarPeak * volCompareLevel3) {
 
       Serial.print("mic2 is ");
       Serial.print(volCompareLevel2);
@@ -349,7 +448,7 @@ void loop()
 
     }
 
-    if (peakToPeak2 > peakToPeak * volCompareLevel3) {
+    if (rightEarPeak > leftEarPeak * volCompareLevel3) {
 
       Serial.print("mic2 is more than ");
       Serial.print(volCompareLevel3);
@@ -361,7 +460,7 @@ void loop()
 
     ///// turn to centre
 
-    if (peakToPeak < peakToPeak2 * volCompareLevel1 && peakToPeak2 < peakToPeak * volCompareLevel1) {
+    if (leftEarPeak < rightEarPeak * volCompareLevel1 && rightEarPeak < leftEarPeak * volCompareLevel1) {
 
 
       Serial.print("both mic1 and mic2 have volumes which are no more than ");
