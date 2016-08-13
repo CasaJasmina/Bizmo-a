@@ -29,17 +29,17 @@ const int sampleWindow2 = 100; // Sample window width in mS (50 mS = 20Hz)
 unsigned int sample2;
 unsigned long intervalTime;
 
-int motionPin = A2;    // select the input pin for the potentiometer
+int motionPin = A3;    // select the input pin for the potentiometer
 int motionValue = 0;  // variable to store the value coming from the sensor
 int motionTreeshold = 250;
 
 void setup()
 {
   Serial.begin(9600);
-  myShakeServo.attach(9);
+  myShakeServo.attach(A1);
   myShakeServo.write(90);
 
-  myNodServo.attach(7);
+  myNodServo.attach(A2);
   myNodServo.write(90);
 
   pinMode(motionPin, INPUT);
@@ -213,7 +213,7 @@ void motionSensor(){
   if( motionValue < motionTreeshold) {
     nodDance(125, 90, 55, 3, 10);
     
-    Serial.println(motionValue);sound_servo_control.ino
+    Serial.println(motionValue);
   }
 }
 
@@ -232,7 +232,7 @@ void loop()
 
   while (millis() - startMillis < sampleWindow)
   {
-    sample = analogRead(A0);
+    sample = analogRead(A4);
     if (sample < 1024)  // toss out spurious readings
     {
       if (sample > signalMax)
@@ -257,7 +257,7 @@ void loop()
 
   while (millis() - startMillis2 < sampleWindow2)
   {
-    sample2 = analogRead(A6);
+    sample2 = analogRead(A5);
     if (sample2 < 1024)  // toss out spurious readings
     {
       if (sample2 > signalMax2)
