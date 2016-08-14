@@ -25,13 +25,13 @@ int volCompareLevel3 = ((5 * volCompare) + 1);
 const int rightEarSampleWindow = 100; // rightEarSample window width in mS (50 mS = 20Hz)
 unsigned int rightEarSample;
 
-const int rightEarSampleWindow2 = 100; // rightEarSample window width in mS (50 mS = 20Hz)
-unsigned int rightEarrightEarSample;
+const int leftEarSampleWindow = 100; // rightEarSample window width in mS (50 mS = 20Hz)
+unsigned int leftEarSample;
 unsigned long intervalTime;
 
 int motionPin = A3;    // select the input pin for the potentiometer
 int motionValue = 0;  // variable to store the value coming from the sensor
-int motionTreeshold = 250;
+int motionTreshold = 250;
 
 void setup()
 {
@@ -307,11 +307,13 @@ void shakeDance(int nodAngle, int shakeRightAngle, int shakeResetAngle, int shak
 
 }
 
+//// setup motion sensor function - do nod dance on motion detected
+
 void motionSensor(){
   motionValue = analogRead(motionPin);
 
-  if( motionValue < motionTreeshold) {
-    nodDance(125, 90, 55, 3, 10);
+  if( motionValue < motionTreshold) {
+    nodDance(125, 90, 55, 3, 10);   //    integers needed for nodDance function - int nodTopAngle, int nodResetAngle, int nodBottomAngle, int nodNumber, int overrideNodSpeed
     
     Serial.println(motionValue);
   }
@@ -322,12 +324,20 @@ void loop()
 {
 
   motionSensor();
+  Serial.println(motionValue);
 
-  unsigned long startMillis = millis(); // Start of rightEarSample window
-  unsigned int leftEarPeak = 0;   // peak-to-peak level
+  //// definitions for the mics (ears)
 
   unsigned int signalMax = 0;
   unsigned int signalMin = 1024;
+
+
+  //// definitions for the right ear
+
+  unsigned long startMillis = millis(); // Start of rightEarSample window
+  unsigned int rightEarPeak = 0;   // peak-to-peak level
+
+  
 
   while (millis() - startMillis < rightEarSampleWindow)
   {
@@ -344,42 +354,37 @@ void loop()
       }
     }
   }
-  leftEarPeak = signalMax - signalMin;  // max - min = peak-peak amplitude
+
+  rightEarPeak = signalMax - signalMin;  // max - min = peak-peak amplitude
 
 
+  //// definitions for the leftear
 
   unsigned long startMillis2 = millis(); // Start of rightEarSample window
-  unsigned int rightEarPeak = 0;   // peak-to-peak level
+  unsigned int leftEarPeak = 0;   // peak-to-peak level
 
-  unsigned int signalMax2 = 0;
-  unsigned int signalMin2 = 1024;
-
-  while (millis() - startMillis2 < rightEarSampleWindow2)
+  while (millis() - startMillis2 < leftEarSampleWindow)
   {
-    rightEarrightEarSample = analogRead(A5);
-    if (rightEarrightEarSample < 1024)  // toss out spurious readings
+    leftEarSample = analogRead(A5);
+    if (leftEarSample < 1024)  // toss out spurious readings
     {
-      if (rightEarrightEarSample > signalMax2)
+      if (leftEarSample > signalMax)
       {
-        signalMax2 = rightEarrightEarSample;  // save just the max levels
+        signalMax = leftEarSample;  // save just the max levels
       }
-      else if (rightEarrightEarSample < signalMin2)
+      else if (leftEarSample < signalMin)
       {
-        signalMin2 = rightEarrightEarSample;  // save just the min levels
+        signalMin = leftEarSample;  // save just the min levels
       }
     }
   }
 
+  leftEarPeak = signalMax - signalMin;  // max - min = peak-peak amplitude
+
+
+  //// check volume is above threshold before comparing volumes for ears
   
-//  Serial.println("Nod dance should be happening");
-
-      
-  rightEarPeak = signalMax2 - signalMin2;  // max - min = peak-peak amplitude
-
-
   if (leftEarPeak > 120 || rightEarPeak > 120) {
-
-//    nodDance(125, 90, 55, 2, 30);
 
 
     ///// turns to left
@@ -472,6 +477,9 @@ void loop()
     }
 
   }
+
+
+  //// reset timer - if no activity heard in 15 seconds reset to center
 
   if (millis() - intervalTime > 15*1000) {
   
