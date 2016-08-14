@@ -30,7 +30,7 @@ You can find the 3D parts for the head in a folder at the root of the repository
 
 ### Laser Cutting
 
-To build the structure of your Bizmoa you need to Laser Cut out of 4mm Ply. You can find these files for Laser Cutting in the folder at the root of this repository called `Bizmoa_body_laser_cutting_files`.
+To build the structure of your Bizmoa you need to Laser Cut out of 3mm Ply. You can find these files for Laser Cutting in the folder at the root of this repository called `Bizmoa_body_2D_parts`.
 
 ### Feedback
 
