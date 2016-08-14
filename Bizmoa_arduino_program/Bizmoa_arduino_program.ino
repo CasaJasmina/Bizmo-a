@@ -27,6 +27,7 @@ unsigned int rightEarSample;
 
 const int leftEarSampleWindow = 100; // rightEarSample window width in mS (50 mS = 20Hz)
 unsigned int leftEarSample;
+
 unsigned long intervalTime;
 
 int motionPin = A3;    // select the input pin for the potentiometer
